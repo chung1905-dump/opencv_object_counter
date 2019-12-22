@@ -12,10 +12,11 @@ dil_ero_value_x = 15
 dil_ero_value_y = 15
 ksize_1 = 1
 ksize_2 = 7
+thresh_type_inv = True
 
 
 def on_press(event):
-    global thresh_value, dil_ero_value_x, dil_ero_value_y, block_size, ksize_1, ksize_2
+    global thresh_value, dil_ero_value_x, dil_ero_value_y, block_size, ksize_1, ksize_2, thresh_type_inv
     if event.key == 'j':
         thresh_value -= 5
     if event.key == 'k':
@@ -40,7 +41,8 @@ def on_press(event):
         ksize_2 -= 2
     if event.key == 'v':
         ksize_2 += 2
-
+    if event.key == ' ':  # Space
+        thresh_type_inv = not thresh_type_inv
     show()
     plt.show()
 
@@ -60,11 +62,19 @@ def show():
     axes[0][2].imshow(img, cmap="gray", vmin=0, vmax=255)
 
     # Local adaptative threshold
-    # img = cv.adaptiveThreshold(img, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, block_size,
-    #                               thresh_value)
-    t_val, img = cv.threshold(img, thresh_value, 255, cv.THRESH_BINARY)
+    adaptive = False
+    if adaptive:
+        img = cv.adaptiveThreshold(img, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, block_size,
+                                   thresh_value)
+    else:
+        if thresh_type_inv:
+            thresh_type = cv.THRESH_BINARY_INV
+        else:
+            thresh_type = cv.THRESH_BINARY
+        t_val, img = cv.threshold(img, thresh_value, 255, thresh_type)
     img = cv.medianBlur(img, ksize=ksize_1)
-    axes[1][0].set_title('blocksize([]) = ' + str(block_size) + '. ' + 'C(jk) = ' + str(thresh_value) + '\nksize(zx): ' + str(ksize_1))
+    axes[1][0].set_title(
+        'blocksize([]) = ' + str(block_size) + '. ' + 'C(jk) = ' + str(thresh_value) + '\nksize(zx): ' + str(ksize_1))
     axes[1][0].imshow(img, cmap="gray", vmin=0, vmax=255)
 
     # Dilatation et erosion
@@ -73,7 +83,8 @@ def show():
     img = cv.erode(img, kernel, iterations=1)
     # clean all noise after dilatation and erosion
     img = cv.medianBlur(img, ksize=ksize_2)
-    axes[1][1].set_title('D&E (nm,.): ' + str(dil_ero_value_x) + '-' + str(dil_ero_value_y) + '\nksize(cv): ' + str(ksize_2))
+    axes[1][1].set_title(
+        'D&E (nm,.): ' + str(dil_ero_value_x) + '-' + str(dil_ero_value_y) + '\nksize(cv): ' + str(ksize_2))
     axes[1][1].imshow(img, cmap="gray", vmin=0, vmax=255)
 
     # Labeling
