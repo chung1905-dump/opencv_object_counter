@@ -2,17 +2,18 @@ import numpy as np
 import cv2 as cv
 import matplotlib.pyplot as plt
 
-original = cv.imread('image/2_chicks.jpg')
+original = cv.imread('image/danvit.jpg')
 
 f, axes = plt.subplots(2, 3)
 
-thresh_value = 165
+thresh_value = 155
 block_size = 21
-dil_ero_value_x = 15
-dil_ero_value_y = 15
-ksize_1 = 1
-ksize_2 = 7
-thresh_type_inv = True
+dil_ero_value_x = 11
+dil_ero_value_y = 11
+ksize_1 = 13
+ksize_2 = 11
+thresh_type_inv = False
+adaptive = False
 
 
 def on_press(event):
@@ -62,7 +63,6 @@ def show():
     axes[0][2].imshow(img, cmap="gray", vmin=0, vmax=255)
 
     # Local adaptative threshold
-    adaptive = False
     if adaptive:
         img = cv.adaptiveThreshold(img, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, block_size,
                                    thresh_value)
@@ -72,7 +72,8 @@ def show():
         else:
             thresh_type = cv.THRESH_BINARY
         t_val, img = cv.threshold(img, thresh_value, 255, thresh_type)
-    img = cv.medianBlur(img, ksize=ksize_1)
+    kernel = np.ones((dil_ero_value_x, dil_ero_value_y), np.uint8)
+    img = cv.erode(img, kernel, iterations=1)
     axes[1][0].set_title(
         'blocksize([]) = ' + str(block_size) + '. ' + 'C(jk) = ' + str(thresh_value) + '\nksize(zx): ' + str(ksize_1))
     axes[1][0].imshow(img, cmap="gray", vmin=0, vmax=255)
