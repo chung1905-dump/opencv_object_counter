@@ -2,7 +2,7 @@ import numpy as np
 import cv2 as cv
 import matplotlib.pyplot as plt
 
-original = cv.imread('image/danvit.jpg')
+original = cv.imread('image/2_chicks.jpg')
 
 f, axes = plt.subplots(2, 3)
 
@@ -14,10 +14,12 @@ ksize_1 = 13
 ksize_2 = 11
 thresh_type_inv = False
 adaptive = False
+dil_ero_value_x_2 = 13
+dil_ero_value_y_2 = 13
 
 
 def on_press(event):
-    global thresh_value, dil_ero_value_x, dil_ero_value_y, block_size, ksize_1, ksize_2, thresh_type_inv
+    global thresh_value, dil_ero_value_x, dil_ero_value_y, block_size, ksize_1, ksize_2, thresh_type_inv, dil_ero_value_x_2, dil_ero_value_y_2
     if event.key == 'j':
         thresh_value -= 5
     if event.key == 'k':
@@ -30,6 +32,14 @@ def on_press(event):
         dil_ero_value_y -= 2
     if event.key == '.':
         dil_ero_value_y += 2
+    if event.key == 'e':
+        dil_ero_value_x_2 -= 2
+    if event.key == 'r':
+        dil_ero_value_x_2 += 2
+    if event.key == 't':
+        dil_ero_value_y_2 -= 2
+    if event.key == 'y':
+        dil_ero_value_y_2 += 2
     if event.key == '[':
         block_size -= 2
     if event.key == ']':
@@ -72,10 +82,10 @@ def show():
         else:
             thresh_type = cv.THRESH_BINARY
         t_val, img = cv.threshold(img, thresh_value, 255, thresh_type)
-    kernel = np.ones((dil_ero_value_x, dil_ero_value_y), np.uint8)
+    kernel = np.ones((dil_ero_value_x_2, dil_ero_value_y_2), np.uint8)
     img = cv.erode(img, kernel, iterations=1)
     axes[1][0].set_title(
-        'blocksize([]) = ' + str(block_size) + '. ' + 'C(jk) = ' + str(thresh_value) + '\nksize(zx): ' + str(ksize_1))
+        'blocksize([]) = ' + str(block_size) + '. ' + 'C(jk) = ' + str(thresh_value) + '\nE(erty): ' + str(dil_ero_value_x_2) + '-' + str(dil_ero_value_y_2))
     axes[1][0].imshow(img, cmap="gray", vmin=0, vmax=255)
 
     # Dilatation et erosion
